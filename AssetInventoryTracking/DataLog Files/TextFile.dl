@@ -1,0 +1,17 @@
+﻿cost_of_item(5,500,datetime(2017,3,30,19,19,25)).
+name_of_item(5,laptop,datetime(2017,3,30,19,19,25)).
+date_purchased_of_item(5,date(2016,04,05),datetime(2017,3,30,19,19,25)).
+make_of_item(5,hp,datetime(2017,3,30,19,19,25)).
+model_of_item(5,2020,datetime(2017,3,30,19,19,25)).
+status_of_item(5,up,datetime(2017,3,30,19,19,25)).
+length_of_warranty_of_item(5,3,datetime(2017,3,30,19,19,25)).
+cost_of_item(4,400,datetime(2017,4,1,15,41,29)).
+name_of_item(4,test,datetime(2017,4,1,15,41,29)).
+date_purchased_of_item(4,date(2016,01,01),datetime(2017,4,1,15,41,29)).
+make_of_item(4,hp,datetime(2017,4,1,15,41,29)).
+model_of_item(4,2020,datetime(2017,4,1,15,41,29)).
+status_of_item(4,up,datetime(2017,4,1,15,41,29)).
+length_of_warranty_of_item(4,4,datetime(2017,4,1,15,41,29)).
+workorder_for_item(1,1,datetime(2017,4,2,13,32,38)).
+status_of_workorder(1,open,datetime(2017,4,2,13,32,38)).
+status_of_item(1,down,datetime(2017,4,2,13,32,38)).

@@ -1,0 +1,40 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site1.master.cs" Inherits="AssetInventoryTracking.Master.Site1" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+ 
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="Default.aspx">Home <span class="sr-only">(current)</span></a></li>
+                        <li><a href="AddInventoryItem.aspx">Add Inventory Item</a></li>
+                        <li><a href="AddWorkOrder.aspx">Add Work order</a></li>
+                        <li><a href="SearchItem.aspx">Search Item</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+          <div class="container">
+        <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+      
+
+        
+        </asp:ContentPlaceHolder>
+              </div>
+    </div>
+    </form>
+</body>
+</html>

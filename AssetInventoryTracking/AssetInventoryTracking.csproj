@@ -66,7 +66,11 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="AddInventoryItem.aspx" />
+    <Content Include="AddWorkOrder.aspx" />
     <Content Include="packages.config" />
+    <Content Include="Master\Site1.Master" />
+    <Content Include="DataLog Files\Inventory_Tracking.dl" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -75,10 +79,54 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Default.aspx" />
+    <Content Include="SearchItem.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddInventoryItem.aspx.cs">
+      <DependentUpon>AddInventoryItem.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AddInventoryItem.aspx.designer.cs">
+      <DependentUpon>AddInventoryItem.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AddWorkOrder.aspx.cs">
+      <DependentUpon>AddWorkOrder.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="AddWorkOrder.aspx.designer.cs">
+      <DependentUpon>AddWorkOrder.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="AppCode\BO\inventory_item.cs" />
+    <Compile Include="AppCode\BO\workorder.cs" />
+    <Compile Include="AppCode\DAL\inventory_item.cs" />
+    <Compile Include="AppCode\DAL\workorder.cs" />
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Master\Site1.Master.cs">
+      <DependentUpon>Site1.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Master\Site1.Master.designer.cs">
+      <DependentUpon>Site1.Master</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SearchItem.aspx.cs">
+      <DependentUpon>SearchItem.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SearchItem.aspx.designer.cs">
+      <DependentUpon>SearchItem.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="AppCode\Helper\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

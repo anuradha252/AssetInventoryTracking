@@ -1,0 +1,164 @@
+% Inventory Tracking
+%
+% Datalog Formulation
+
+% Declare types
+:- type(cost_of_item(inventory_id: int, cost_of_item: int, time_stamp: datetime)).
+
+:- type(date_purchased(inventory_id: int, date_purchased: date, time_stamp: datetime)).
+
+:- type(name_of_item(inventory_id: int, item_name: string, time_stamp: datetime)).
+
+:- type(make_of_item(inventory_id: int, item_make: string, time_stamp: datetime)).
+
+:- type(model_of_item(inventory_id: int, item_model: string, time_stamp: datetime)).
+
+:- type(status_of_item(inventory_id: int, status: string, time_stamp: datetime)).
+
+:- type(length_of_warranty_of_item(inventory_id: int, years: int, time_stamp: datetime)).
+
+:- type(workorder_of_item(workorder_id: int, inventory_id: int, time_stamp: datetime)).
+
+:- type(status_of_workorder(workorder_id: int, status: string, time_stamp: datetime)).
+
+:- type(date_completed_of_workorder(workorder_id: int, date_completed: datetime, time_stamp: datetime)).
+
+:- type(warranty_expired(inventory_id: int)).
+
+%% ------------- Rules ------------- %%
+
+%% Get the inital date of an item I when the cost was first entered into the inventory at DT1.
+initial_date_cost_of_item(I, R) :- min(cost_of_item(I, _, TS), TS, R).
+
+%% Get the latest date of the item I if the cost was changed sometime later.
+latest_date_cost_of_item(I, R) :- max(cost_of_item(I, _, TS), TS, R).
+
+%% Get the status of item I
+get_status_of_item(I, R) :- max(status_of_item(I, _ , TS), TS, R).
+
+%% An item I's status is down if there is an open work order for I.
+status_of_item(I, down, TS) :- workorder_of_item(WO, I, TS),
+                               status_of_workorder(WO, open, TS).
+                               
+
+
+
+
+%% The status of item I is up if the is a work order WO for I, WO was open at 
+%% time stamp TS2, WO is now closed at TS3, and TS3 > TS2
+status_of_item(I, up, TS3) :- workorder_of_item(WO, I, TS2),
+		              status_of_workorder(WO, open, TS2),
+		              status_of_workorder(WO, closed, TS3), 
+		              TS3 > TS2.
+				     
+%% It is impossible to have a workorder WO that is open and closed at the same time TS.	     
+:- status_of_workorder(WO, open, TS), status_of_workorder(WO, closed, TS).
+
+%% It is impossible for the status of item I to be up and down at the same time T+S.
+:- status_of_item(I, up, TS), status_of_item(I, down, TS).
+
+%% Default: The status of an item I is down if the status of I is null
+%% (unknown). 
+status_of_item(I, down, TS) :- status_of_item(I, unknown, TS).
+
+%% Warranty of an item I has expired if the sum the date purchased
+%% (year) and the length of warranty is greater than the current
+%% date time.
+warranty_expired(I) :- date_purchased_of_item(I, DP, TS),
+		       '$year'(DP, Y),
+		       length_of_warranty_of_item(I, WL, TS),
+		       Z = Y + WL,
+		       Z < 2017. 
+
+%% ------------- End of Rules ------------- %%
+
+
+%% ------------- Initialization of Items in Inventory ------------- %%
+
+%% Initialization of Item 1
+cost_of_item(1,200,datetime(2017,3,30,19,3,20)).
+name_of_item(1,laptop,datetime(2017,3,30,19,3,20)).
+date_purchased_of_item(1,date(2016,01,01),datetime(2017,3,30,19,3,20)).
+make_of_item(1,hp,datetime(2017,3,30,19,3,20)).
+model_of_item(1,hp2020,datetime(2017,3,30,19,3,20)).
+status_of_item(1,up,datetime(2017,3,30,19,3,20)).
+length_of_warranty_of_item(1,4,datetime(2017,3,30,19,3,20)).
+
+%% Initialization of Item 2
+cost_of_item(2,300,datetime(2017,3,30,19,4,59)).
+name_of_item(2,laptop,datetime(2017,3,30,19,4,59)).
+date_purchased_of_item(2,date(2017,01,01),datetime(2017,3,30,19,4,59)).
+make_of_item(2,dell,datetime(2017,3,30,19,4,59)).
+model_of_item(2,dell3000,datetime(2017,3,30,19,4,59)).
+status_of_item(2,up,datetime(2017,3,30,19,4,59)).
+length_of_warranty_of_item(2,3,datetime(2017,3,30,19,4,59)).
+
+%% Initialization of Item 3
+cost_of_item(3,400,datetime(2017,3,30,19,5,26)).
+name_of_item(3,server1,datetime(2017,3,30,19,5,26)).
+date_purchased_of_item(3,date(2016,01,01),datetime(2017,3,30,19,5,26)).
+make_of_item(3,cisco,datetime(2017,3,30,19,5,26)).
+model_of_item(3,cisco2020,datetime(2017,3,30,19,5,26)).
+status_of_item(3,up,datetime(2017,3,30,19,5,26)).
+length_of_warranty_of_item(3,5,datetime(2017,3,30,19,5,26)).
+
+%% Initialization of Item 4
+cost_of_item(4,400,datetime(2017,3,30,19,6,15)).
+name_of_item(4,switch1,datetime(2017,3,30,19,6,15)).
+date_purchased_of_item(4,date(2017,01,01),datetime(2017,3,30,19,6,15)).
+make_of_item(4,apple,datetime(2017,3,30,19,6,15)).
+model_of_item(4,switch2020,datetime(2017,3,30,19,6,15)).
+status_of_item(4,up,datetime(2017,3,30,19,6,15)).
+length_of_warranty_of_item(4,3,datetime(2017,3,30,19,6,15)).
+
+%% Initialization of Item 5
+cost_of_item(5,500,datetime(2017,3,30,19,19,25)).
+name_of_item(5,laptop,datetime(2017,3,30,19,19,25)).
+date_purchased_of_item(5,date(2016,04,05),datetime(2017,3,30,19,19,25)).
+make_of_item(5,hp,datetime(2017,3,30,19,19,25)).
+model_of_item(5,hp2020,datetime(2017,3,30,19,19,25)).
+status_of_item(5,up,datetime(2017,3,30,19,19,25)).
+length_of_warranty_of_item(5,3,datetime(2017,3,30,19,19,25)).
+
+%% Initialization of Item 6
+cost_of_item(6,500,datetime(2017,1,30,19,19,25)).
+name_of_item(6,laptop,datetime(2017,1,30,19,19,25)).
+date_purchased_of_item(6,date(2015,04,05),datetime(2017,1,30,19,19,25)).
+make_of_item(6,hp,datetime(2017,1,30,19,19,25)).
+model_of_item(6,hp2020,datetime(2017,1,30,19,19,25)).
+status_of_item(6,unknown,datetime(2017,1,30,19,19,25)).
+length_of_warranty_of_item(6,1,datetime(2017,1,30,19,19,25)).
+
+%% ------------- End of Initialization of Items in Inventory ------------- %%
+
+
+%% ------------- Possible Scenarios - test our queries ------------- %%
+
+%% Cost of item 1 has changed from 200 -> 400
+cost_of_item(1,400,datetime(2017,4,11,20,00,00)).
+
+%% There is a workorder opened for item 1. The workorder is later closed.
+workorder_of_item(1, 1, datetime(2017,3,31,08,00,00)).
+status_of_workorder(1, open, datetime(2017,3,31,08,00,00)).
+status_of_workorder(1, closed, datetime(2017,3,31,08,30,00)).
+date_completed_of_workorder(1,datetime(2017,3,31,08,30,00),datetime(2017,3,31,08,30,00)).
+
+%% There is a workorder opened for item 2. The workorder is later closed.
+workorder_of_item(2, 2, datetime(2017,3,31,08,10,00)).
+status_of_workorder(2, open, datetime(2017,3,31,08,10,00)).
+status_of_workorder(2, closed, datetime(2017,3,31,08,20,00)).
+date_completed_of_workorder(2,datetime(2017,3,31,08,30,00),datetime(2017,3,31,08,20,00)).
+
+%% There is a workorder opened for item 3 and the workorder is in progress (has not been closed).
+workorder_of_item(3, 3, datetime(2017,4,04,09,15,00)).
+status_of_workorder(3, open, datetime(2017,4,04,09,15,00)).
+date_completed_of_workorder(3,null,null).
+
+%% There is a workorder opened for item 5 and the workorder is in progress (has not been closed).
+workorder_of_item(4, 5, datetime(2017,4,11,09,15,00)).
+status_of_workorder(4, open, datetime(2017,4,11,09,15,00)).
+
+%% The warranty of item 6 is expired and the status is unknown.
+
+%% ------------- End of Possible Scenarios ------------- %%
+
