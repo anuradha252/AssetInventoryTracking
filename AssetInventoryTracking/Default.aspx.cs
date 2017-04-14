@@ -135,7 +135,7 @@ namespace AssetInventoryTracking
                                     matcheddatenew = matcheddatenew.Replace("datetime(", "");
                                     matcheddatenew = matcheddatenew.Replace(")", "");
                                     stringinsplit = stringinsplit.Replace(matcheddate, matcheddatenew);
-
+                                     
                                 }
                             }
                             if(stringinsplit.Contains("date("))
