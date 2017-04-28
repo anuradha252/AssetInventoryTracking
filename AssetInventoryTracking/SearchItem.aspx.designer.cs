@@ -112,13 +112,22 @@ namespace AssetInventoryTracking {
         protected global::System.Web.UI.HtmlControls.HtmlInputCheckBox chkwarrantyexpired;
         
         /// <summary>
-        /// btnsubmit control.
+        /// chkToReplace control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlButton btnsubmit;
+        protected global::System.Web.UI.HtmlControls.HtmlInputCheckBox chkToReplace;
+        
+        /// <summary>
+        /// btngetvalue control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btngetvalue;
         
         /// <summary>
         /// btnsearchnet control.
@@ -130,6 +139,15 @@ namespace AssetInventoryTracking {
         protected global::System.Web.UI.HtmlControls.HtmlButton btnsearchnet;
         
         /// <summary>
+        /// HiddenField control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden HiddenField;
+        
+        /// <summary>
         /// gvAssetInventory control.
         /// </summary>
         /// <remarks>
@@ -137,5 +155,14 @@ namespace AssetInventoryTracking {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView gvAssetInventory;
+        
+        /// <summary>
+        /// ItemdivQuerySection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ItemdivQuerySection;
     }
 }

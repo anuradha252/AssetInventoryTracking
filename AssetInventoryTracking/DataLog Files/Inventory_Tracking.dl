@@ -5,7 +5,7 @@
 % Declare types
 :- type(cost_of_item(inventory_id: int, cost_of_item: int, time_stamp: datetime)).
 
-:- type(date_purchased(inventory_id: int, date_purchased: date, time_stamp: datetime)).
+:- type(date_purchased_of_item(inventory_id: int, date_purchased: date, time_stamp: datetime)).
 
 :- type(name_of_item(inventory_id: int, item_name: string, time_stamp: datetime)).
 
@@ -23,28 +23,52 @@
 
 :- type(date_completed_of_workorder(workorder_id: int, date_completed: datetime, time_stamp: datetime)).
 
+:- type(date_item_added_to_inv(inventory_id: int, time_stamp: datetime)).
+
 :- type(warranty_expired(inventory_id: int)).
+
+:- type(find_init_date_and_cost_of_item(inventory_id: int, cost: int, time_stamp: datetime)).
 
 %% ------------- Rules ------------- %%
 
-%% Get the inital date of an item I when the cost was first entered into the inventory at DT1.
-initial_date_cost_of_item(I, R) :- min(cost_of_item(I, _, TS), TS, R).
+%% Get the inital date of an item I when the cost was first entered into the inventory.
+get_initial_cost_of_item(I, R) :- min(cost_of_item(I, _, TS), TS, R).
 
-%% Get the latest date of the item I if the cost was changed sometime later.
-latest_date_cost_of_item(I, R) :- max(cost_of_item(I, _, TS), TS, R).
+%% Get the initial date and cost of an item I when I was first entered into the inventory.
+find_init_date_and_cost_of_item(I, C, R) :- min(cost_of_item(I, C, TS), TS, R).
 
 %% Get the status of item I
 get_status_of_item(I, R) :- max(status_of_item(I, _ , TS), TS, R).
 
+%% Get the status of workorder I
+get_status_of_workorder(I, R) :- max(status_of_workorder(I, _ , TS), TS, R).
+
+%% Get the model of item I
+get_model_of_item(I, R) :- max(model_of_item(I, _ , TS), TS, R).
+
+%% Get the name of item I
+get_name_of_item(I, R) :- max(name_of_item(I, _ , TS), TS, R).
+
+%% Get the make of item I
+get_make_of_item(I, R) :- max(make_of_item(I, _ , TS), TS, R).
+
+%% Get the date purchased of item I
+get_date_purchased_of_item(I, R) :- max(date_purchased_of_item(I, _ , TS), TS, R).
+
+%% Get the date_completed_of_workorder of item I
+get_date_completed_of_workorder(I, R) :- max(date_completed_of_workorder(I, _ , TS), TS, R).
+
+%% Get the length of the warranty of item I
+get_length_of_warranty_of_item(I, R) :- max(length_of_warranty_of_item(I, _, TS), TS, R).
+
+%% Get the cost of item I
+get_cost_of_item(I, R) :- max(cost_of_item(I, _ , TS), TS, R).
+
 %% An item I's status is down if there is an open work order for I.
 status_of_item(I, down, TS) :- workorder_of_item(WO, I, TS),
                                status_of_workorder(WO, open, TS).
-                               
 
-
-
-
-%% The status of item I is up if the is a work order WO for I, WO was open at 
+%% The status of item I is up if there is a work order WO for I, WO was open at 
 %% time stamp TS2, WO is now closed at TS3, and TS3 > TS2
 status_of_item(I, up, TS3) :- workorder_of_item(WO, I, TS2),
 		              status_of_workorder(WO, open, TS2),
@@ -54,11 +78,10 @@ status_of_item(I, up, TS3) :- workorder_of_item(WO, I, TS2),
 %% It is impossible to have a workorder WO that is open and closed at the same time TS.	     
 :- status_of_workorder(WO, open, TS), status_of_workorder(WO, closed, TS).
 
-%% It is impossible for the status of item I to be up and down at the same time T+S.
+%% It is impossible for the status of item I to be up and down at the same time TS.
 :- status_of_item(I, up, TS), status_of_item(I, down, TS).
 
-%% Default: The status of an item I is down if the status of I is null
-%% (unknown). 
+%% Default: The status of an item I is down if the status of I is null (unknown). 
 status_of_item(I, down, TS) :- status_of_item(I, unknown, TS).
 
 %% Warranty of an item I has expired if the sum the date purchased
@@ -68,10 +91,17 @@ warranty_expired(I) :- date_purchased_of_item(I, DP, TS),
 		       '$year'(DP, Y),
 		       length_of_warranty_of_item(I, WL, TS),
 		       Z = Y + WL,
-		       Z < 2017. 
+		       Z < 2017.
+
+%% Replace an inventory item I if it has 4 or more work orders associated with it in a certain
+%% year (year starts on Jan. 1st and ends Dec. 31st).
+replace(I) :- count(workorder_of_item(_, I, _), I, R), R >= 4.
+
+%% Cost of purchase for an item that needs to be replaced can be calculated as follows:
+%% (initial cost of the inventory item) * ( 1 +  (percent change in cost/100) ) ^ 2 
+cost_to_replace(I, NewCost) :- replace(I), find_init_date_and_cost_of_item(I, C, _), NewCost = C * 1.02 * 1.02.
 
 %% ------------- End of Rules ------------- %%
-
 
 %% ------------- Initialization of Items in Inventory ------------- %%
 
@@ -79,6 +109,7 @@ warranty_expired(I) :- date_purchased_of_item(I, DP, TS),
 cost_of_item(1,200,datetime(2017,3,30,19,3,20)).
 name_of_item(1,laptop,datetime(2017,3,30,19,3,20)).
 date_purchased_of_item(1,date(2016,01,01),datetime(2017,3,30,19,3,20)).
+date_item_added_to_inv(1, datetime(2017,3,30,19,3,20)).
 make_of_item(1,hp,datetime(2017,3,30,19,3,20)).
 model_of_item(1,hp2020,datetime(2017,3,30,19,3,20)).
 status_of_item(1,up,datetime(2017,3,30,19,3,20)).
@@ -88,6 +119,7 @@ length_of_warranty_of_item(1,4,datetime(2017,3,30,19,3,20)).
 cost_of_item(2,300,datetime(2017,3,30,19,4,59)).
 name_of_item(2,laptop,datetime(2017,3,30,19,4,59)).
 date_purchased_of_item(2,date(2017,01,01),datetime(2017,3,30,19,4,59)).
+date_item_added_to_inv(2, datetime(2017,3,30,19,4,59)).
 make_of_item(2,dell,datetime(2017,3,30,19,4,59)).
 model_of_item(2,dell3000,datetime(2017,3,30,19,4,59)).
 status_of_item(2,up,datetime(2017,3,30,19,4,59)).
@@ -97,6 +129,7 @@ length_of_warranty_of_item(2,3,datetime(2017,3,30,19,4,59)).
 cost_of_item(3,400,datetime(2017,3,30,19,5,26)).
 name_of_item(3,server1,datetime(2017,3,30,19,5,26)).
 date_purchased_of_item(3,date(2016,01,01),datetime(2017,3,30,19,5,26)).
+date_item_added_to_inv(3, datetime(2017,3,30,19,5,26)).
 make_of_item(3,cisco,datetime(2017,3,30,19,5,26)).
 model_of_item(3,cisco2020,datetime(2017,3,30,19,5,26)).
 status_of_item(3,up,datetime(2017,3,30,19,5,26)).
@@ -106,15 +139,18 @@ length_of_warranty_of_item(3,5,datetime(2017,3,30,19,5,26)).
 cost_of_item(4,400,datetime(2017,3,30,19,6,15)).
 name_of_item(4,switch1,datetime(2017,3,30,19,6,15)).
 date_purchased_of_item(4,date(2017,01,01),datetime(2017,3,30,19,6,15)).
+date_item_added_to_inv(4, datetime(2017,3,30,19,6,15)).
 make_of_item(4,apple,datetime(2017,3,30,19,6,15)).
 model_of_item(4,switch2020,datetime(2017,3,30,19,6,15)).
 status_of_item(4,up,datetime(2017,3,30,19,6,15)).
 length_of_warranty_of_item(4,3,datetime(2017,3,30,19,6,15)).
 
+
 %% Initialization of Item 5
 cost_of_item(5,500,datetime(2017,3,30,19,19,25)).
 name_of_item(5,laptop,datetime(2017,3,30,19,19,25)).
 date_purchased_of_item(5,date(2016,04,05),datetime(2017,3,30,19,19,25)).
+date_item_added_to_inv(5, datetime(2017,3,30,19,19,25)).
 make_of_item(5,hp,datetime(2017,3,30,19,19,25)).
 model_of_item(5,hp2020,datetime(2017,3,30,19,19,25)).
 status_of_item(5,up,datetime(2017,3,30,19,19,25)).
@@ -124,10 +160,45 @@ length_of_warranty_of_item(5,3,datetime(2017,3,30,19,19,25)).
 cost_of_item(6,500,datetime(2017,1,30,19,19,25)).
 name_of_item(6,laptop,datetime(2017,1,30,19,19,25)).
 date_purchased_of_item(6,date(2015,04,05),datetime(2017,1,30,19,19,25)).
+date_item_added_to_inv(6, datetime(2017,3,30,19,19,25)).
 make_of_item(6,hp,datetime(2017,1,30,19,19,25)).
 model_of_item(6,hp2020,datetime(2017,1,30,19,19,25)).
-status_of_item(6,unknown,datetime(2017,1,30,19,19,25)).
-length_of_warranty_of_item(6,1,datetime(2017,1,30,19,19,25)).
+
+cost_of_item(7,50,datetime(2017,4,17,11,34,38)).
+name_of_item(7,switch,datetime(2017,4,17,11,34,38)).
+date_purchased_of_item(7,date(2015,01,01),datetime(2017,4,17,11,34,38)).
+date_item_added_to_inv(7, datetime(2017,4,17,11,34,38)).
+make_of_item(7,cisco,datetime(2017,4,17,11,34,38)).
+model_of_item(7,mo1234,datetime(2017,4,17,11,34,38)).
+status_of_item(7,up,datetime(2017,4,17,11,34,38)).
+length_of_warranty_of_item(7,4,datetime(2017,4,17,11,34,38)).
+
+cost_of_item(8,50,datetime(2017,4,20,18,45,22)).
+name_of_item(8,mobile_router,datetime(2017,4,20,18,45,22)).
+date_purchased_of_item(8,date(2017,01,01),datetime(2017,4,20,18,45,22)).
+make_of_item(8,cisco,datetime(2017,4,20,18,45,22)).
+model_of_item(8,cisco1234,datetime(2017,4,20,18,45,22)).
+status_of_item(8,up,datetime(2017,4,20,18,45,22)).
+length_of_warranty_of_item(8,5,datetime(2017,4,20,18,45,22)).
+date_item_added_to_inv(8,datetime(2017,4,20,18,45,22)).
+
+cost_of_item(9,200,datetime(2017,4,23,12,20,43)).
+name_of_item(9,item9,datetime(2017,4,23,12,20,43)).
+date_purchased_of_item(9,date(2016,01,01),datetime(2017,4,23,12,20,43)).
+make_of_item(9,hp,datetime(2017,4,23,12,20,43)).
+model_of_item(9,mo1234,datetime(2017,4,23,12,20,43)).
+status_of_item(9,up,datetime(2017,4,23,12,20,43)).
+length_of_warranty_of_item(9,4,datetime(2017,4,23,12,20,43)).
+date_item_added_to_inv(9,datetime(2017,4,23,12,20,43)).
+
+cost_of_item(10,200,datetime(2017,4,23,13,18,19)).
+name_of_item(10,item10,datetime(2017,4,23,13,18,19)).
+date_purchased_of_item(10,date(2017,01,01),datetime(2017,4,23,13,18,19)).
+make_of_item(10,hp,datetime(2017,4,23,13,18,19)).
+model_of_item(10,hp2020,datetime(2017,4,23,13,18,19)).
+status_of_item(10,up,datetime(2017,4,23,13,18,19)).
+length_of_warranty_of_item(10,4,datetime(2017,4,23,13,18,19)).
+date_item_added_to_inv(10,datetime(2017,4,23,13,18,19)).
 
 %% ------------- End of Initialization of Items in Inventory ------------- %%
 
@@ -137,7 +208,7 @@ length_of_warranty_of_item(6,1,datetime(2017,1,30,19,19,25)).
 %% Cost of item 1 has changed from 200 -> 400
 cost_of_item(1,400,datetime(2017,4,11,20,00,00)).
 
-%% There is a workorder opened for item 1. The workorder is later closed.
+%% There is a work order opened for item 1. The work order is later closed.
 workorder_of_item(1, 1, datetime(2017,3,31,08,00,00)).
 status_of_workorder(1, open, datetime(2017,3,31,08,00,00)).
 status_of_workorder(1, closed, datetime(2017,3,31,08,30,00)).
@@ -147,18 +218,71 @@ date_completed_of_workorder(1,datetime(2017,3,31,08,30,00),datetime(2017,3,31,08
 workorder_of_item(2, 2, datetime(2017,3,31,08,10,00)).
 status_of_workorder(2, open, datetime(2017,3,31,08,10,00)).
 status_of_workorder(2, closed, datetime(2017,3,31,08,20,00)).
-date_completed_of_workorder(2,datetime(2017,3,31,08,30,00),datetime(2017,3,31,08,20,00)).
+date_completed_of_workorder(2,datetime(2017,3,31,08,20,00),datetime(2017,3,31,08,30,00)).
 
-%% There is a workorder opened for item 3 and the workorder is in progress (has not been closed).
+%% There is a work order opened for item 3 and the work order is in progress (has not been closed).
 workorder_of_item(3, 3, datetime(2017,4,04,09,15,00)).
 status_of_workorder(3, open, datetime(2017,4,04,09,15,00)).
-date_completed_of_workorder(3,null,null).
+date_completed_of_workorder(3,null,datetime(2017,4,04,09,15,00)).
 
 %% There is a workorder opened for item 5 and the workorder is in progress (has not been closed).
 workorder_of_item(4, 5, datetime(2017,4,11,09,15,00)).
 status_of_workorder(4, open, datetime(2017,4,11,09,15,00)).
+date_completed_of_workorder(4,null, datetime(2017,4,11,09,15,00)).
 
 %% The warranty of item 6 is expired and the status is unknown.
+status_of_item(6,unknown,datetime(2017,1,30,19,19,25)).
+length_of_warranty_of_item(6,1,datetime(2017,1,30,19,19,25)).
+
+%% Item 9 has 4 work orders opened in 2017, thus it will need to be replaced
+workorder_of_item(9, 9, datetime(2017,01,28,08,00,00)).
+status_of_workorder(9, open, datetime(2017,01,28,08,00,00)).
+date_completed_of_workorder(9,null,datetime(2017,01,28,08,00,00)).
+status_of_workorder(9, closed, datetime(2017,01,29,09,00,00)).
+date_completed_of_workorder(9,datetime(2017,01,29,09,00,00),datetime(2017,01,29,09,00,00)).
+
+workorder_of_item(10, 9, datetime(2017,02,03,10,00,00)).
+status_of_workorder(10, open, datetime(2017,02,03,10,00,00)).
+date_completed_of_workorder(9,null,datetime(2017,02,03,10,00,00)).
+status_of_workorder(10, closed, datetime(2017,02,03,12,00,00)).
+date_completed_of_workorder(9,datetime(2017,02,03,12,00,00),datetime(2017,02,03,12,00,00)).
+
+workorder_of_item(11, 9, datetime(2017,03,15,13,00,00)).
+status_of_workorder(11, open, datetime(2017,03,15,13,00,00)).
+date_completed_of_workorder(11,null,datetime(2017,03,15,13,00,00)).
+status_of_workorder(11, closed, datetime(2017,03,16,11,00,00)).
+date_completed_of_workorder(11,datetime(2017,03,16,11,00,00),datetime(2017,03,16,11,00,00)).
+
+workorder_of_item(12, 9, datetime(2017,04,10,09,30,00)).
+status_of_workorder(12, open, datetime(2017,04,10,09,30,00)).
+date_completed_of_workorder(12,null,datetime(2017,01,28,08,00,00)).
+status_of_workorder(12, closed, datetime(2017,04,10,12,30,00)).
+date_completed_of_workorder(12,datetime(2017,04,10,12,30,00),datetime(2017,04,10,12,30,00)).
+
+%% Item 4 has an open work order
+workorder_of_item(13,4,datetime(2017,4,27,18,36,14)).
+status_of_workorder(13,open,datetime(2017,4,27,18,36,14)).
+date_completed_of_workorder(13,null,datetime(2017,4,27,18,36,14)).
+
+%% Item 8 has an open work order
+workorder_of_item(5,8,datetime(2017,4,23,12,56,16)).
+status_of_workorder(5,open,datetime(2017,4,23,12,56,16)).
+date_completed_of_workorder(5,null,datetime(2017,4,23,12,56,16)).
+
+%% Item 9 has an open work order
+workorder_of_item(6,9,datetime(2017,4,23,13,5,53)).
+status_of_workorder(6,open,datetime(2017,4,23,13,5,53)).
+date_completed_of_workorder(6,null,datetime(2017,4,23,13,5,53)).
+
+%% Item 10 has an open work order.
+workorder_of_item(7,10,datetime(2017,4,24,13,19,8)).
+status_of_workorder(7,open,datetime(2017,4,24,13,19,8)).
+date_completed_of_workorder(7,null,datetime(2017,4,24,13,19,8)).
+
+%% Item 10 work order is closed.
+status_of_workorder(7,closed,datetime(2017,4,25,13,20,55)).
+date_completed_of_workorder(7,datetime(2017,4,25,13,20,55),datetime(2017,4,25,13,20,55)).
 
 %% ------------- End of Possible Scenarios ------------- %%
+
 

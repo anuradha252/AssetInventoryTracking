@@ -19,6 +19,7 @@ namespace AssetInventoryTracking
                 BO.AssetInventoryTracking.workorder wo = (new BO.AssetInventoryTracking.workorder()).GetByIDworkorder(Convert.ToInt32(Request.QueryString[0]));
                 txtAddInventoryID.Value = wo.inventoryID.ToString();
                 txtWorkOrderID.Value = wo.workorderID.ToString();
+                txtAddDateCompleted.Value =  wo.date_completed.ToString();
                 if (wo.status == "open")
                 {
                     Radio1.Checked = true;
@@ -29,49 +30,7 @@ namespace AssetInventoryTracking
                 }
             }
         }
-        protected void DataLogClicked(object sender, EventArgs e)
-        {
-            Process startprocess = new Process();
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-
-            startInfo.FileName = "C:\\Users\\Anuradha\\Downloads\\DES Software-20170323T222711Z-001\\DES Software\\des\\des.exe";
-            startInfo.RedirectStandardInput = true;
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.UseShellExecute = false;
-
-            startprocess.StartInfo = startInfo;
-            startprocess.Start();
-
-            StreamWriter sw = startprocess.StandardInput;
-            sw.WriteLine("/consult C:\\Users\\Anuradha\\Documents\\visual studio 2015\\Projects\\InventoryTracking\\InventoryTracking\\DataLog Files\\Inventory_Tracking.dl");
-            sw.WriteLine("/listing C:\\Users\\Anuradha\\Documents\\visual studio 2015\\Projects\\InventoryTracking\\InventoryTracking\\DataLog Files\\Inventory_Tracking.dl");
-            sw.WriteLine("cost_of_item(X,Y,DT).");
-            sw.Close();
-
-
-            string output = startprocess.StandardOutput.ReadToEnd();
-            string outputtoHTML = "";
-
-            string whole = output;
-            string[] split = Regex.Split(whole, "DES>");
-            foreach (string part in split)
-            {
-                if (!(part.Contains("*********")))
-                {
-                    outputtoHTML = outputtoHTML + part;
-                }
-            }
-
-            datalogsection.InnerHtml = outputtoHTML;
-            string err = startprocess.StandardError.ReadToEnd();
-            Console.WriteLine(err);
-
-            startprocess.WaitForExit();
-
-
-
-        }
+      
         protected void NETAddClicked(object sender, EventArgs e)
         {
 
@@ -85,41 +44,50 @@ namespace AssetInventoryTracking
                 {
                     status = "open";
                     xitem.status_of_item = "down";
+                    wo.date_created = DateTime.Now;
                 }
                 else
                 {
                     xitem.status_of_item = "up";
-                    status = "close";
+                    status = "closed";
+                    wo.date_completed = Convert.ToDateTime(txtAddDateCompleted.Value);
                 }
                 wo.status = status;
-                if (status == "close")
-                {
-                    wo.date_completed = DateTime.Now;
-                }
-
+                xitem.date_modified = DateTime.Now;
+                wo.date_modified = DateTime.Now;
                 xitem.Save();
                 wo.Save();
             }
             else
             {
-                BO.AssetInventoryTracking.workorder wo = new BO.AssetInventoryTracking.workorder();
+                BO.AssetInventoryTracking.workorder wo = (new BO.AssetInventoryTracking.workorder()).GetByIDworkorder(Convert.ToInt32(txtWorkOrderID.Value));
+                if(wo.workorderID == -1)
+                {
+                    wo = new BO.AssetInventoryTracking.workorder();
+                }
+               // BO.AssetInventoryTracking.workorder wo = new BO.AssetInventoryTracking.workorder();
                 wo.inventoryID = Convert.ToInt32(txtAddInventoryID.Value);
+
                 BO.AssetInventoryTracking.inventory_item xitem = (new BO.AssetInventoryTracking.inventory_item()).GetByIDinventory_item(wo.inventoryID);
                 string status = "";
                 if (Radio1.Checked)
                 {
                     status = "open";
                     xitem.status_of_item = "down";
+                    wo.date_created = DateTime.Now;
                 }
                 else
                 {
                     xitem.status_of_item = "up";
-                    status = "close";
+                    status = "closed";
+                    wo.date_completed = Convert.ToDateTime(txtAddDateCompleted.Value);
                 }
                 wo.status = status;
-                wo.date_created = DateTime.Now;
+                xitem.date_modified = DateTime.Now;
+                wo.date_modified = DateTime.Now;
                 xitem.Save();
                 wo.Save();
+                valmessage.InnerText = "Workorder saved successfully!";
             }
 
         }
@@ -131,7 +99,7 @@ namespace AssetInventoryTracking
 
             //Response.Write(test);
             StreamWriter sw = default(StreamWriter);
-            string strFile = "C:\\Users\\Anuradha\\Documents\\visual studio 2015\\Projects\\InventoryTracking\\InventoryTracking\\DataLog Files\\Inventory_Tracking.dl";
+            string strFile = "C:\\Users\\Anuradha\\Documents\\visual studio 2015\\Projects\\AssetInventoryTracking\\AssetInventoryTracking\\DataLog Files\\Inventory_Tracking.dl";
             if ((!File.Exists(strFile)))
             {
                 File.Create(strFile).Close();
@@ -154,6 +122,10 @@ namespace AssetInventoryTracking
                 }
                 sw.Close();
             }
+
+            valmessage.InnerText = "Workorder saved successfully!";
+            //txtAddInventoryID.Value = "";
+            //txtWorkOrderID.Value = "";
         }
     }
 }

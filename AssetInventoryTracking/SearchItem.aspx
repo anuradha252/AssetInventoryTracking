@@ -4,56 +4,85 @@
         $(document).ready(function () {
             $('#divQuerySection').hide();
 
-            $('#btnsubmit').click(function (e) {
-                var str = "";
-                var selectedOption = $("input:radio[name=optionsRadios]:checked").val();
+             $('#<% =btngetvalue.ClientID %>').click(function (e) {
+                 var str = "";
+                 var selectedOption = $("input:radio[name*=optionsRadios]:checked").val();
                 var valinvID = "";
-                valinvID = $('#txtInventoryID').val();
-                valmake = $('#txtMake').val();
-                valModel = $('#txtModel').val();
-                valDatePurchasedFrom = $('#txtDatePurchasedFrom').val();
-                valDatePurchasedTo = $('#txtDatePurchasedTo').val();
-                valCost = $('#txtCost').val();
-
+                var valstatus = "";
+                var valName = "";
+                var valLW = "";
+                 
+                valinvID = $('input[id*=txtInventoryID]').val();
+                valmake = $('input[id*=txtMake]').val();
+                valModel = $('input[id*=txtModel]').val();
+                valDatePurchasedFrom = $('input[id*=txtDatePurchasedFrom]').val();
+                valDatePurchasedTo = $('input[id*=txtDatePurchasedTo]').val();
+                valCost = $('input[id*=txtCost]').val();
+                valName = $('input[id*=txtName]').val();
+                valLW = $('input[id*=txtLengthOfWarranty]').val();
+                valstatus = selectedOption;
+               
+                if (valName == '') {
+                    valName = "N";
+                }
+                if (valLW == '') {
+                    valLW = "LW";
+                }
                 if (valinvID == '') {
-                    valinvID = "X";
+                    valinvID = "I";
                 }
                 if (valmake == '') {
-                    valmake = "Y";
+                    valmake = "M";
                 }
                 if (valModel == '') {
-                    valModel = "Z";
+                    valModel = "Mo";
                 }
                 if (valCost == '') {
                     valCost = "C";
                 }
-                if ($('#chkwarrantyexpired').is(":checked")) {
-                    str += "has_warranty_expired_of_item(" + valinvID + ");";
+                if ($('input[id*=chkToReplace]').is(":checked")) {
+                    str = "getanswer(" + valinvID + "," + valCost + ",DP," + valmake + "," + valModel + "," + valstatus + "," + valName + "," + valLW + ",DAL,NewCost) :- ";
+
+                }
+                else {
+                    str = "getanswer(" + valinvID + "," + valCost + ",DP," + valmake + "," + valModel + "," + valstatus + "," + valName + "," + valLW + ",DAL) :- ";
+
+                }
+                //need to get queyr for this
+                if ($('input[id*=chkwarrantyexpired]').is(":checked")) {
+                    str += "warranty_expired(" + valinvID + "),";
+                }
+                if ($('input[id*=chkToReplace]').is(":checked")) {
+                    str += "replace(" + valinvID + "),";
+                    str += "cost_to_replace(" + valinvID + ",NewCost),";
                 }
                 //date purchased
-                str += "date_purchased(" + valinvID + ",DP)";
+                str += "date_purchased_of_item(" + valinvID + ",DP,DTP)";
                 if (valDatePurchasedFrom != "") {
                     var from = valDatePurchasedFrom.split("-");
-                    str += ",DP > date(" + from[2] + "," + from[1] + "," + from[0] + ")";
+                    str += ",DP > date(" + from[0] + "," + from[1] + "," + from[2] + ")";
                 }
                 if (valDatePurchasedTo != "")
                 {
                     var to = valDatePurchasedTo.split("-");
-                    str += ",DP < date(" + to[2] + "," + to[1] + "," + to[0] + ")";
+                    str += ",DP < date(" + to[0] + "," + to[1] + "," + to[2] + ")";
                 }
-                str += ";";
+                str += ",get_date_purchased_of_item(" + valinvID + ",DTP),";
                
-                str += "has_warranty_expired_of_item(" + valinvID + ");";
+                //str += "warranty_expired(" + valinvID + ");";
+                str += "name_of_item(" + valinvID + "," + valName + ",DTN),get_name_of_item(" + valinvID + ", DTN),";
+                str += "length_of_warranty_of_item(" + valinvID + "," + valLW + ",DLW),get_length_of_warranty_of_item(" + valinvID + ", DLW),";
+                str += "make_of_item(" + valinvID + "," + valmake + ",DTM),get_make_of_item(" + valinvID + ", DTM),";
 
-                str += "make_of_item(" + valinvID + "," + valmake + ");";
+                str += "model_of_item(" + valinvID + "," + valModel + ",DTMo),get_model_of_item(" + valinvID + ", DTMo),";
 
-                str += "model_of_item(" + valinvID + "," + valModel + ");";
+                str += "cost_of_item(" + valinvID + "," + valCost + ",DTC),get_cost_of_item(" + valinvID + ", DTC),";
 
-                str += "cost_of_item(" + valinvID + "," + valCost + "),max_date_cost_of_item(DT);";
+                str += "status_of_item(" + valinvID + "," + valstatus + ",DTS),get_status_of_item(" + valinvID + ", DTS),date_item_added_to_inv(" + valinvID + ",DAL).";
 
                 $('#lblQueries').text(str);
                 $('#divQuerySection').show();
-
+                      $('#<% =HiddenField.ClientID %>').attr('value', str);
             });
         });
     </script>
@@ -119,9 +148,17 @@
                         Warranty Expired?
                     </label>
                 </div>
-                <button type="button" class="btn btn-primary" id="btnsubmit" runat="server">Submit</button>
+               <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" id="chkToReplace"  runat="server"/>
+                        To replace?
+                    </label>
+                </div>
+               <asp:Button ID="btngetvalue" runat="server" Text="Search using ASP" OnClick="AddClicked" class="btn btn-primary"/>
+               
                   <button type="button" class="btn btn-primary" id="btnsearchnet" runat="server" onserverclick="search_clicked">Search using .NET</button>
-            </div>
+              <input id="HiddenField" type="hidden" runat="server" value="" />
+        </div>
             <div class="col-md-6">
                 <div id="divQuerySection">
                     <h1>Query Section</h1>
@@ -132,5 +169,6 @@
                  <asp:GridView ID="gvAssetInventory" runat="server" class="table table-striped">
 
     </asp:GridView>
+                  <div id="ItemdivQuerySection" runat="server"></div>
             </div>
 </asp:Content>

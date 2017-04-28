@@ -27,7 +27,7 @@ namespace DAL.AssetInventoryTracking
         public List<BO.AssetInventoryTracking.inventory_item> GetAllinventory_item()
 		{
 			List<BO.AssetInventoryTracking.inventory_item> xinventory_itemList = new List<BO.AssetInventoryTracking.inventory_item>();
-			string query = "SELECT [inventoryID],[length_of_warranty],[cost],[name],[make],[model],[date_purchased],[percent_change_cost],[status_of_item] FROM dbo.[inventory_item]";
+			string query = "SELECT [inventoryID],[length_of_warranty],[cost],[name],[make],[model],[date_purchased],[status_of_item],[date_modified],[date_added] FROM dbo.[inventory_item]";
 			using (System.Data.SqlClient.SqlConnection conn = new System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings["db_AssetInventoryTracking"].ConnectionString)) {
 				using (System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, conn)) {
 					conn.Open();
@@ -48,7 +48,7 @@ namespace DAL.AssetInventoryTracking
 							}
                             if (!object.ReferenceEquals(reader["name"], DBNull.Value))
                             {
-                                xinventory_item.make = reader["name"].ToString();
+                                xinventory_item.name = reader["name"].ToString();
                             }
                             if (!object.ReferenceEquals(reader["cost"], DBNull.Value))
                             {
@@ -57,10 +57,15 @@ namespace DAL.AssetInventoryTracking
                             if (!object.ReferenceEquals(reader["date_purchased"], DBNull.Value)) {
 								xinventory_item.date_purchased = DateTime.Parse(reader["date_purchased"].ToString());
 							}
-							if (!object.ReferenceEquals(reader["percent_change_cost"], DBNull.Value)) {
-								xinventory_item.percent_change_cost = int.Parse(reader["percent_change_cost"].ToString());
-							}
-							if (!object.ReferenceEquals(reader["status_of_item"], DBNull.Value)) {
+                            if (!object.ReferenceEquals(reader["date_modified"], DBNull.Value))
+                            {
+                                xinventory_item.date_modified = DateTime.Parse(reader["date_modified"].ToString());
+                            }
+                            if (!object.ReferenceEquals(reader["date_added"], DBNull.Value))
+                            {
+                                xinventory_item.date_added = DateTime.Parse(reader["date_added"].ToString());
+                            }
+                            if (!object.ReferenceEquals(reader["status_of_item"], DBNull.Value)) {
 								xinventory_item.status_of_item = reader["status_of_item"].ToString();
 							}
 							xinventory_itemList.Add(xinventory_item);
@@ -74,7 +79,7 @@ namespace DAL.AssetInventoryTracking
 		public   BO.AssetInventoryTracking.inventory_item GetByIDinventory_item(int inventory_itemID)
 		{
 			BO.AssetInventoryTracking.inventory_item xinventory_item = new BO.AssetInventoryTracking.inventory_item();
-			string query = "SELECT [inventoryID],[length_of_warranty],[cost],[name],[make],[model],[date_purchased],[percent_change_cost],[status_of_item] FROM dbo.[inventory_item] WHERE inventoryID=@inventoryID";
+			string query = "SELECT [inventoryID],[length_of_warranty],[cost],[name],[make],[model],[date_purchased],[status_of_item],[date_modified],[date_added] FROM dbo.[inventory_item] WHERE inventoryID=@inventoryID";
 			using (System.Data.SqlClient.SqlConnection conn = new System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings["db_AssetInventoryTracking"].ConnectionString)) {
 				using (System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, conn)) {
 					cmd.Parameters.AddWithValue("@inventoryID", inventory_itemID);
@@ -89,7 +94,7 @@ namespace DAL.AssetInventoryTracking
 							}
                             if (!object.ReferenceEquals(reader["name"], DBNull.Value))
                             {
-                                xinventory_item.make = reader["name"].ToString();
+                                xinventory_item.name = reader["name"].ToString();
                             }
                             if (!object.ReferenceEquals(reader["cost"], DBNull.Value))
                             {
@@ -104,10 +109,15 @@ namespace DAL.AssetInventoryTracking
 							if (!object.ReferenceEquals(reader["date_purchased"], DBNull.Value)) {
 								xinventory_item.date_purchased = DateTime.Parse(reader["date_purchased"].ToString());
 							}
-							if (!object.ReferenceEquals(reader["percent_change_cost"], DBNull.Value)) {
-								xinventory_item.percent_change_cost = int.Parse(reader["percent_change_cost"].ToString());
-							}
-							if (!object.ReferenceEquals(reader["status_of_item"], DBNull.Value)) {
+                            if (!object.ReferenceEquals(reader["date_modified"], DBNull.Value))
+                            {
+                                xinventory_item.date_modified = DateTime.Parse(reader["date_modified"].ToString());
+                            }
+                            if (!object.ReferenceEquals(reader["date_added"], DBNull.Value))
+                            {
+                                xinventory_item.date_added = DateTime.Parse(reader["date_added"].ToString());
+                            }
+                            if (!object.ReferenceEquals(reader["status_of_item"], DBNull.Value)) {
 								xinventory_item.status_of_item = reader["status_of_item"].ToString();
 							}
 						}
@@ -120,7 +130,7 @@ namespace DAL.AssetInventoryTracking
 		public  int Addinventory_item(BO.AssetInventoryTracking.inventory_item inventory_item)
 		{
 			int inventory_itemID = 0;
-			string query = "INSERT INTO dbo.[inventory_item] ([length_of_warranty],[cost],[name],[make],[model],[date_purchased],[percent_change_cost],[status_of_item]) VALUES (  @length_of_warranty, @cost,@name,@make, @model, @date_purchased, @percent_change_cost, @status_of_item) ; SELECT SCOPE_IDENTITY();";
+			string query = "INSERT INTO dbo.[inventory_item] ([length_of_warranty],[cost],[name],[make],[model],[date_purchased],[status_of_item],[date_modified],[date_added]) VALUES (  @length_of_warranty, @cost,@name,@make, @model, @date_purchased, @status_of_item,@date_modified,@date_added) ; SELECT SCOPE_IDENTITY();";
 			using (System.Data.SqlClient.SqlConnection conn = new System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings["db_AssetInventoryTracking"].ConnectionString)) {
 				using (System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, conn)) {
 					
@@ -130,9 +140,11 @@ namespace DAL.AssetInventoryTracking
                     cmd.Parameters.AddWithValue("@make", inventory_item.make);
 					cmd.Parameters.AddWithValue("@model", inventory_item.model);
 					cmd.Parameters.AddWithValue("@date_purchased", inventory_item.date_purchased);
-					cmd.Parameters.AddWithValue("@percent_change_cost", inventory_item.percent_change_cost);
+					
 					cmd.Parameters.AddWithValue("@status_of_item", inventory_item.status_of_item);
-					conn.Open();
+                    cmd.Parameters.AddWithValue("@date_added", inventory_item.date_added);
+                    cmd.Parameters.AddWithValue("@date_modified", inventory_item.date_modified);
+                    conn.Open();
 					inventory_itemID = int.Parse(cmd.ExecuteScalar().ToString());
 				}
 			}
@@ -156,7 +168,7 @@ namespace DAL.AssetInventoryTracking
 		public  int Updateinventory_item(BO.AssetInventoryTracking.inventory_item inventory_item)
 		{
 			int RowsAffected = -1;
-			string query = "UPDATE dbo.[inventory_item] SET length_of_warranty = @length_of_warranty,[cost]=@cost,[name]=@name,make = @make,model = @model,date_purchased = @date_purchased,percent_change_cost = @percent_change_cost,status_of_item = @status_of_item WHERE inventoryID=@inventoryID";
+			string query = "UPDATE dbo.[inventory_item] SET length_of_warranty = @length_of_warranty,[cost]=@cost,[name]=@name,make = @make,model = @model,date_purchased = @date_purchased,status_of_item = @status_of_item,date_modified = @date_modified,date_added = @date_added WHERE inventoryID=@inventoryID";
 			using (System.Data.SqlClient.SqlConnection conn = new System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings["db_AssetInventoryTracking"].ConnectionString)) {
 				using (System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, conn)) {
 					if ((inventory_item.inventoryID == -1)) {
@@ -170,9 +182,11 @@ namespace DAL.AssetInventoryTracking
                     cmd.Parameters.AddWithValue("@make", inventory_item.make);
 					cmd.Parameters.AddWithValue("@model", inventory_item.model);
 					cmd.Parameters.AddWithValue("@date_purchased", inventory_item.date_purchased);
-					cmd.Parameters.AddWithValue("@percent_change_cost", inventory_item.percent_change_cost);
+					//cmd.Parameters.AddWithValue("@percent_change_cost", inventory_item.percent_change_cost);
 					cmd.Parameters.AddWithValue("@status_of_item", inventory_item.status_of_item);
-					conn.Open();
+                    cmd.Parameters.AddWithValue("@date_added", inventory_item.date_added);
+                    cmd.Parameters.AddWithValue("@date_modified", inventory_item.date_modified);
+                    conn.Open();
 					RowsAffected = cmd.ExecuteNonQuery();
 				}
 			}
@@ -182,7 +196,7 @@ namespace DAL.AssetInventoryTracking
         public List<BO.AssetInventoryTracking.inventory_item> Searchinventory_item(string name, string ID, string make, string model, string lengthwarranty, string cost, string status, string fromdate,string todate)
         {
             List<BO.AssetInventoryTracking.inventory_item> xinventory_itemList = new List<BO.AssetInventoryTracking.inventory_item>();
-            string query = "SELECT [inventoryID],[length_of_warranty],[cost],[name],[make],[model],[date_purchased],[percent_change_cost],[status_of_item] FROM dbo.[inventory_item] ";
+            string query = "SELECT [inventoryID],[length_of_warranty],[cost],[name],[make],[model],[date_purchased],[status_of_item],[date_modified],[date_added] FROM dbo.[inventory_item] ";
             if(name != "" || ID != "" || make != "" || model != "" || lengthwarranty != "" || cost != "" || status != "" || fromdate != "" || todate != "")
             {
                 query += " WHERE ";
@@ -274,7 +288,7 @@ namespace DAL.AssetInventoryTracking
                             }
                             if (!object.ReferenceEquals(reader["name"], DBNull.Value))
                             {
-                                xinventory_item.make = reader["name"].ToString();
+                                xinventory_item.name = reader["name"].ToString();
                             }
                             if (!object.ReferenceEquals(reader["cost"], DBNull.Value))
                             {
@@ -292,9 +306,13 @@ namespace DAL.AssetInventoryTracking
                             {
                                 xinventory_item.date_purchased = DateTime.Parse(reader["date_purchased"].ToString());
                             }
-                            if (!object.ReferenceEquals(reader["percent_change_cost"], DBNull.Value))
+                            if (!object.ReferenceEquals(reader["date_modified"], DBNull.Value))
                             {
-                                xinventory_item.percent_change_cost = int.Parse(reader["percent_change_cost"].ToString());
+                                xinventory_item.date_modified = DateTime.Parse(reader["date_modified"].ToString());
+                            }
+                            if (!object.ReferenceEquals(reader["date_added"], DBNull.Value))
+                            {
+                                xinventory_item.date_added = DateTime.Parse(reader["date_added"].ToString());
                             }
                             if (!object.ReferenceEquals(reader["status_of_item"], DBNull.Value))
                             {

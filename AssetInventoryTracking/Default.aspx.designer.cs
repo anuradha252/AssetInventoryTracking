@@ -58,6 +58,15 @@ namespace AssetInventoryTracking {
         protected global::System.Web.UI.WebControls.GridView gvAssetInventory;
         
         /// <summary>
+        /// ItemdivQuerySection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ItemdivQuerySection;
+        
+        /// <summary>
         /// gvworkorder control.
         /// </summary>
         /// <remarks>
@@ -67,12 +76,12 @@ namespace AssetInventoryTracking {
         protected global::System.Web.UI.WebControls.GridView gvworkorder;
         
         /// <summary>
-        /// divQuerySection control.
+        /// WOdivQuerySection control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divQuerySection;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl WOdivQuerySection;
     }
 }

@@ -20,8 +20,8 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li class="active"><a href="Default.aspx">Home <span class="sr-only">(current)</span></a></li>
-                        <li><a href="AddInventoryItem.aspx">Add Inventory Item</a></li>
-                        <li><a href="AddWorkOrder.aspx">Add Work order</a></li>
+                        <li><a href="AddInventoryItem.aspx"> Inventory Item</a></li>
+                        <li><a href="AddWorkOrder.aspx"> Work order</a></li>
                         <li><a href="SearchItem.aspx">Search Item</a></li>
                     </ul>
                 </div>

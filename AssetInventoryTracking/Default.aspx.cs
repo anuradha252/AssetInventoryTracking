@@ -41,16 +41,36 @@ namespace AssetInventoryTracking
             StreamWriter sw = startprocess.StandardInput;
             sw.WriteLine("/consult C:\\Users\\Anuradha\\Documents\\visual studio 2015\\Projects\\AssetInventoryTracking\\AssetInventoryTracking\\DataLog Files\\Inventory_Tracking.dl");
             sw.WriteLine("/listing C:\\Users\\Anuradha\\Documents\\visual studio 2015\\Projects\\AssetInventoryTracking\\AssetInventoryTracking\\DataLog Files\\Inventory_Tracking.dl");
-            sw.WriteLine("getanswer(I,C,N,D,M,Mo,UD,WL,DT):-cost_of_item(I,C,DT),name_of_item(I,N,DT),date_purchased_of_item(I,D,DT),make_of_item(I,M,DT),model_of_item(I,Mo,DT),status_of_item(I,UD,DT2),length_of_warranty_of_item(I,WL,DT).");
+            sw.WriteLine("getanswer(I,C,N,D,M,Mo,UD,WL,DTA):-cost_of_item(I,C,DTC),date_item_added_to_inv(I, DTA),name_of_item(I,N,DTN),date_purchased_of_item(I,D,DTP),make_of_item(I,M,DTM),model_of_item(I,Mo,Z),status_of_item(I,UD,R),length_of_warranty_of_item(I,WL,DTL),get_status_of_item(I, R),get_model_of_item(I, Z),get_cost_of_item(I, DTC),get_name_of_item(I, DTN),get_date_purchased_of_item(I, DTP),get_make_of_item(I, DTM),get_length_of_warranty_of_item(I, DTL).");
             sw.Close();
             string[] passcaptions = { "Inventory_ID", "Cost", "Name", "Date Purchased", "Make","Model","Status","Length of warranty","Date time added" };
             string output = startprocess.StandardOutput.ReadToEnd();
             string outputtoHTMLNew = getanswers(output, passcaptions);
-            divQuerySection.InnerHtml = outputtoHTMLNew;
+            ItemdivQuerySection.InnerHtml = outputtoHTMLNew;
 
             string err = startprocess.StandardError.ReadToEnd();
             Console.WriteLine(err);
             startprocess.WaitForExit();
+
+
+        }
+        protected void grdDataItem_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                var firstCell = e.Row.Cells[0];
+                firstCell.Controls.Clear();
+                firstCell.Controls.Add(new HyperLink { NavigateUrl = "AddInventoryItem.aspx?ID=" + firstCell.Text, Text = firstCell.Text });
+            }
+        }
+        protected void grdData_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                var firstCell = e.Row.Cells[0];
+                firstCell.Controls.Clear();
+                firstCell.Controls.Add(new HyperLink { NavigateUrl = "AddWorkOrder.aspx?ID="+ firstCell.Text, Text = firstCell.Text });
+            }
         }
         protected void getwosusingNET_click(object sender, EventArgs e)
         {
@@ -61,7 +81,7 @@ namespace AssetInventoryTracking
             gvworkorder.DataBind();
 
         }
-        protected string getanswers(string output,string[] passcaptions)
+        public string getanswers(string output,string[] passcaptions)
         {
             string outputtoHTML = "";
             string whole = output;
@@ -81,9 +101,12 @@ namespace AssetInventoryTracking
                 outputtoHTMLNew += passcaptions[captionindex];
                 outputtoHTMLNew += "</th>";
             }
+            outputtoHTMLNew += "<th>";
+            outputtoHTMLNew += "Edit";
+            outputtoHTMLNew += "</th>";
             outputtoHTMLNew += "</tr>";
 
-          
+            string IDofoutput = "";
             if (outputtoHTML.Contains("getanswer"))
             {
                 //regex to make the change in teh month directory name
@@ -154,8 +177,15 @@ namespace AssetInventoryTracking
                             }
                             
                             string[] splitvalues = stringinsplit.Split(',');
+                            int indexofloop = 0;
                             foreach (string splitvalue_loopVariable in splitvalues)
                             {
+                               
+                                if(indexofloop == 0)
+                                {
+                                    IDofoutput = splitvalue_loopVariable;
+                                }
+                                indexofloop++;
                                 string splitvalue = splitvalue_loopVariable;
                                 if ((splitvalue.Contains("-")))
                                 {
@@ -209,6 +239,24 @@ namespace AssetInventoryTracking
                                 }
 
                             }
+                            var invflag = "";
+                            foreach (string passcaption in passcaptions)
+                            {
+                                if (passcaption == "Model")
+                                {
+                                    invflag = "Inventory";
+                                    break;
+                                }
+                            }
+                            if(invflag == "Inventory")
+                            {
+                                outputtoHTMLNew += "<td> <a href='AddInventoryItem.aspx?ID=" + IDofoutput + "'>Edit</td>";
+                            }
+                            else
+                            {
+                                outputtoHTMLNew += "<td> <a href='AddWorkOrder.aspx?ID=" + IDofoutput + "'>Edit</td>";
+                            }
+                           
                             outputtoHTMLNew += "</tr>";
                         }
 
@@ -216,6 +264,7 @@ namespace AssetInventoryTracking
                 }
 
             }
+
 
             outputtoHTMLNew += "</table>";
             return outputtoHTMLNew;
@@ -241,12 +290,12 @@ namespace AssetInventoryTracking
             StreamWriter sw = startprocess.StandardInput;
             sw.WriteLine("/consult C:\\Users\\Anuradha\\Documents\\visual studio 2015\\Projects\\AssetInventoryTracking\\AssetInventoryTracking\\DataLog Files\\Inventory_Tracking.dl");
             sw.WriteLine("/listing C:\\Users\\Anuradha\\Documents\\visual studio 2015\\Projects\\AssetInventoryTracking\\AssetInventoryTracking\\DataLog Files\\Inventory_Tracking.dl");
-            sw.WriteLine("getanswer(W, I, S,DT, DT1) :- workorder_of_item(W, I, DT),status_of_workorder(W, S, DT2),date_completed_of_workorder(W, DT1, DT2).");
+            sw.WriteLine(" getanswer(W,I,S,DT1,DT) :- workorder_of_item(W,I,DT1), status_of_workorder(W,S,R),date_completed_of_workorder(W,DT,R2),get_status_of_workorder(W,R),get_date_completed_of_workorder(W,R2).");
             sw.Close();
             string[] passcaptions = { "workorder_ID", "Inventory_ID", "Status of workorder", "Date Created", "Date Completed" };
             string output = startprocess.StandardOutput.ReadToEnd();
             string outputtoHTMLNew = getanswers(output, passcaptions);
-            divQuerySection.InnerHtml = outputtoHTMLNew;
+            WOdivQuerySection.InnerHtml = outputtoHTMLNew;
 
             string err = startprocess.StandardError.ReadToEnd();
             Console.WriteLine(err);

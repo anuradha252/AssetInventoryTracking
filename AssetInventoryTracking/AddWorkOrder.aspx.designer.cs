@@ -13,6 +13,15 @@ namespace AssetInventoryTracking {
     public partial class AddWorkOrder {
         
         /// <summary>
+        /// valmessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl valmessage;
+        
+        /// <summary>
         /// txtWorkOrderID control.
         /// </summary>
         /// <remarks>
@@ -31,13 +40,13 @@ namespace AssetInventoryTracking {
         protected global::System.Web.UI.HtmlControls.HtmlInputText txtAddInventoryID;
         
         /// <summary>
-        /// txtComment control.
+        /// txtAddDateCompleted control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputText txtComment;
+        protected global::System.Web.UI.HtmlControls.HtmlInputGenericControl txtAddDateCompleted;
         
         /// <summary>
         /// Radio1 control.
@@ -74,15 +83,6 @@ namespace AssetInventoryTracking {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button btnsaveNET;
-        
-        /// <summary>
-        /// btnDatalog control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnDatalog;
         
         /// <summary>
         /// HiddenField control.

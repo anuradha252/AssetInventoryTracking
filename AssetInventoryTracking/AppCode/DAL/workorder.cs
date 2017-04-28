@@ -27,7 +27,7 @@ namespace DAL.AssetInventoryTracking
         public List<BO.AssetInventoryTracking.workorder> GetAllworkorder()
 		{
 			List<BO.AssetInventoryTracking.workorder> xworkorderList = new List<BO.AssetInventoryTracking.workorder>();
-			string query = "SELECT [workorderID],[date_created],[date_completed],[status],[inventoryID] FROM dbo.[workorder]";
+			string query = "SELECT [workorderID],[date_created],[date_completed],[status],[inventoryID],[date_modified] FROM dbo.[workorder]";
 			using (System.Data.SqlClient.SqlConnection conn = new System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings["db_AssetInventoryTracking"].ConnectionString)) {
 				using (System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, conn)) {
 					conn.Open();
@@ -49,7 +49,11 @@ namespace DAL.AssetInventoryTracking
 							if (!object.ReferenceEquals(reader["inventoryID"], DBNull.Value)) {
 								xworkorder.inventoryID = int.Parse(reader["inventoryID"].ToString());
 							}
-							xworkorderList.Add(xworkorder);
+                            if (!object.ReferenceEquals(reader["date_modified"], DBNull.Value))
+                            {
+                                xworkorder.date_modified = DateTime.Parse(reader["date_modified"].ToString());
+                            }
+                            xworkorderList.Add(xworkorder);
 						}
 					}
 				}
@@ -60,7 +64,7 @@ namespace DAL.AssetInventoryTracking
 		public BO.AssetInventoryTracking.workorder GetByIDworkorder(int workorderID)
 		{
 			BO.AssetInventoryTracking.workorder xworkorder = new BO.AssetInventoryTracking.workorder();
-			string query = "SELECT [workorderID],[date_created],[date_completed],[status],[inventoryID] FROM dbo.[workorder] WHERE workorderID=@workorderID";
+			string query = "SELECT [workorderID],[date_created],[date_completed],[status],[inventoryID],[date_modified] FROM dbo.[workorder] WHERE workorderID=@workorderID";
 			using (System.Data.SqlClient.SqlConnection conn = new System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings["db_AssetInventoryTracking"].ConnectionString)) {
 				using (System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, conn)) {
 					cmd.Parameters.AddWithValue("@workorderID", workorderID);
@@ -82,7 +86,11 @@ namespace DAL.AssetInventoryTracking
 							if (!object.ReferenceEquals(reader["inventoryID"], DBNull.Value)) {
 								xworkorder.inventoryID = int.Parse(reader["inventoryID"].ToString());
 							}
-						}
+                            if (!object.ReferenceEquals(reader["date_modified"], DBNull.Value))
+                            {
+                                xworkorder.date_modified = DateTime.Parse(reader["date_modified"].ToString());
+                            }
+                        }
 					}
 				}
 			}
@@ -92,7 +100,7 @@ namespace DAL.AssetInventoryTracking
 		public int Addworkorder(BO.AssetInventoryTracking.workorder workorder)
 		{
 			int workorderID = 0;
-			string query = "INSERT INTO dbo.[workorder] ([date_created],[date_completed],[status],[inventoryID]) VALUES (@date_created, @date_completed, @status, @inventoryID) ";
+			string query = "INSERT INTO dbo.[workorder] ([date_created],[date_completed],[status],[inventoryID],[date_modified]) VALUES (@date_created, @date_completed, @status, @inventoryID,@date_modified) ";
 			using (System.Data.SqlClient.SqlConnection conn = new System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings["db_AssetInventoryTracking"].ConnectionString)) {
 				using (System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, conn)) {
 					cmd.Parameters.AddWithValue("@date_created", workorder.date_created);
@@ -104,8 +112,15 @@ namespace DAL.AssetInventoryTracking
                     {
                         cmd.Parameters.AddWithValue("@date_completed", workorder.date_completed);
                     }
-					
-					cmd.Parameters.AddWithValue("@status", workorder.status);
+                    if (workorder.date_modified == null)
+                    {
+                        cmd.Parameters.AddWithValue("@date_modified", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@date_modified", workorder.date_modified);
+                    }
+                    cmd.Parameters.AddWithValue("@status", workorder.status);
 					if ((workorder.inventoryID == -1)) {
 						cmd.Parameters.AddWithValue("@inventoryID", DBNull.Value);
 					} else {
@@ -135,7 +150,7 @@ namespace DAL.AssetInventoryTracking
 		public int Updateworkorder(BO.AssetInventoryTracking.workorder workorder)
 		{
 			int RowsAffected = -1;
-			string query = "UPDATE dbo.[workorder] SET date_created = @date_created,date_completed = @date_completed,status = @status,inventoryID = @inventoryID WHERE workorderID=@workorderID";
+			string query = "UPDATE dbo.[workorder] SET date_completed = @date_completed,status = @status,inventoryID = @inventoryID,[date_modified]=@date_modified WHERE workorderID=@workorderID";
 			using (System.Data.SqlClient.SqlConnection conn = new System.Data.SqlClient.SqlConnection(ConfigurationManager.ConnectionStrings["db_AssetInventoryTracking"].ConnectionString)) {
 				using (System.Data.SqlClient.SqlCommand cmd = new System.Data.SqlClient.SqlCommand(query, conn)) {
 					if ((workorder.workorderID == -1)) {
@@ -143,9 +158,17 @@ namespace DAL.AssetInventoryTracking
 					} else {
 						cmd.Parameters.AddWithValue("@workorderID", workorder.workorderID);
 					}
-					cmd.Parameters.AddWithValue("@date_created", workorder.date_created);
+					//cmd.Parameters.AddWithValue("@date_created", workorder.date_created);
 					cmd.Parameters.AddWithValue("@date_completed", workorder.date_completed);
-					cmd.Parameters.AddWithValue("@status", workorder.status);
+                    if (workorder.date_modified == null)
+                    {
+                        cmd.Parameters.AddWithValue("@date_modified", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@date_modified", workorder.date_modified);
+                    }
+                    cmd.Parameters.AddWithValue("@status", workorder.status);
 					if ((workorder.inventoryID == -1)) {
 						cmd.Parameters.AddWithValue("@inventoryID", DBNull.Value);
 					} else {

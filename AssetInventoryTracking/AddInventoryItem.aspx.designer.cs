@@ -13,6 +13,15 @@ namespace AssetInventoryTracking {
     public partial class AddInventoryItem {
         
         /// <summary>
+        /// valmessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl valmessage;
+        
+        /// <summary>
         /// txtAddInventoryID control.
         /// </summary>
         /// <remarks>
@@ -46,7 +55,7 @@ namespace AssetInventoryTracking {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputGenericControl txtAddDatePurchased;
+        protected global::System.Web.UI.HtmlControls.HtmlInputText txtAddDatePurchased;
         
         /// <summary>
         /// txtAddMake control.
@@ -65,6 +74,24 @@ namespace AssetInventoryTracking {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlInputText txtAddModel;
+        
+        /// <summary>
+        /// Radio1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputRadioButton Radio1;
+        
+        /// <summary>
+        /// Radio2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputRadioButton Radio2;
         
         /// <summary>
         /// txtLengthOfWarranty control.

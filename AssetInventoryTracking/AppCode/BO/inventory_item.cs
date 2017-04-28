@@ -17,7 +17,8 @@ namespace BO.AssetInventoryTracking
 			_make = "";
 			_model = "";
 			_date_purchased = null;
-			_percent_change_cost = -1;
+            _date_modified = null;
+            _date_added = null;
 			_status_of_item = "up";
             _name = "";
             _cost = 0;
@@ -30,7 +31,9 @@ namespace BO.AssetInventoryTracking
         private decimal _cost;
         private string _model;
 		private DateTime? _date_purchased;
-		private int _percent_change_cost;
+        private DateTime? _date_modified;
+        private DateTime? _date_added;
+     //   private int _percent_change_cost;
 		private string _status_of_item;
 		public int inventoryID {
 			get { return _inventoryID; }
@@ -64,10 +67,20 @@ namespace BO.AssetInventoryTracking
 			get { return _date_purchased; }
 			set { _date_purchased = value; }
 		}
-		public int percent_change_cost {
-			get { return _percent_change_cost; }
-			set { _percent_change_cost = value; }
-		}
+        public DateTime? date_modified
+        {
+            get { return _date_modified; }
+            set { _date_modified = value; }
+        }
+        public DateTime? date_added
+        {
+            get { return _date_added; }
+            set { _date_added = value; }
+        }
+  //      public int percent_change_cost {
+		//	get { return _percent_change_cost; }
+		//	set { _percent_change_cost = value; }
+		//}
 		public string status_of_item {
 			get { return _status_of_item; }
 			set { _status_of_item = value; }
